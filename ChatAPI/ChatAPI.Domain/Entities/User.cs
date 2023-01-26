@@ -15,7 +15,6 @@
 
         public UserPrivacy UserPrivacy { get; set; }
         public Guid UserPrivacyId { get; set; }
-        //   public ICollection<ChatMember> ChatMembers { get; set; }
         public ICollection<BlockedContact> BlockedContacts { get; set; }
 
     }

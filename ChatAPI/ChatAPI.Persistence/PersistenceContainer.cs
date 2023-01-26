@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using ChatAPI.Application.Contracts;
+using ChatAPI.Persistence.Repositories;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace ChatAPI.Persistence
@@ -7,12 +10,11 @@ namespace ChatAPI.Persistence
     {
         public static IServiceCollection AddPersistenceServices(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddDbContext<ChatServiceDbContext>(options =>
+            services.AddDbContext<ChatDbContext>(options =>
             {
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
                 options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             });
-            services.AddScoped(typeof(IAsyncRepository<>), typeof(BaseRepository<>));
             services.AddScoped(typeof(IAuthRepository), typeof(AuthRepository));
             services.AddScoped(typeof(IChatRepository), typeof(ChatRepository));
             services.AddScoped(typeof(IMessageReposiory), typeof(MessageRepository));
