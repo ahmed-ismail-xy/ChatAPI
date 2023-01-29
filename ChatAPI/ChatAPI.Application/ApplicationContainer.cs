@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using AutoMapper;
+using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
 namespace ChatAPI.Application
@@ -7,9 +8,16 @@ namespace ChatAPI.Application
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
-            services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            services.AddSignalR(options =>
+            {
+                options.EnableDetailedErrors = true;
+                options.MaximumReceiveMessageSize = 100000000;
+            });
             return services;
         }
     }
 }
+
+ 

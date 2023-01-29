@@ -1,4 +1,5 @@
 using ChatAPI.Application;
+using ChatAPI.Application.Hubs;
 using ChatAPI.Persistence;
 
 namespace ChatAPI.API
@@ -29,11 +30,12 @@ namespace ChatAPI.API
                 app.UseSwaggerUI();
             }
 
+            app.UseCors("CorsPolicy");
             app.UseHttpsRedirection();
-
+            app.UseAuthentication();
             app.UseAuthorization();
-
-
+            app.UseStaticFiles();
+            app.MapHub<ChatHub>("/chathub");
             app.MapControllers();
 
             app.Run();

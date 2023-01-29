@@ -87,20 +87,23 @@ namespace ChatAPI.API
                      });
             });
 
-           services.AddControllers()
+            services.AddControllers()
                      .AddNewtonsoftJson(options =>
                      {
                          // Use the default property (Pascal) casing
                          options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
                          options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
                      });
-
-           services.AddSignalR(options =>
+            services.AddCors(options =>
             {
-                options.EnableDetailedErrors = true;
-                options.MaximumReceiveMessageSize = 100000000;
+                options.AddPolicy("CorsPolicy",
+                    builder =>
+                    {
+                        builder.AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowAnyHeader();
+                    });
             });
-
 
             return services;
         }

@@ -8,14 +8,11 @@
 
   <ItemGroup>
     <Folder Include="LibraryErrors\" />
-    <Folder Include="FilesHandler\" />
-    <Folder Include="RepositoryDTOs\ChatRepository\" />
-    <Folder Include="RepositoryDTOs\MessageReposiory\" />
-    <Folder Include="RepositoryDTOs\UserRepository\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
   </ItemGroup>

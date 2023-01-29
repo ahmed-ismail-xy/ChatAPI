@@ -12,33 +12,31 @@ namespace ChatAPI.API.Controllers
 
         public AuthController(IAuthRepository authRepository)
         {
-            _authRepository = authRepository;
+            _authRepository = authRepository ?? throw new ArgumentNullException(nameof(authRepository));
         }
 
         [HttpPost("Register")]
-        public async Task<IActionResult> RegisterUserAsync([FromForm] RegisterDTO.Request request)
+        public async Task<IActionResult> RegisterUser([FromForm] RegisterDTO.Request request)
         {
             if (!ModelState.IsValid)
+            {
                 return BadRequest(ModelState);
+            }
 
             var result = await _authRepository.RegisterUserAsync(request);
-            if (result.Success)
-                return Ok(result);
-
-            return BadRequest(result);
+            return result.Success ? (IActionResult)Ok(result.Data) : BadRequest(result.Message);
         }
 
         [HttpPost("Login")]
-        public async Task<IActionResult> LoginUserAsync([FromForm] LoginDTO.Request request)
+        public async Task<IActionResult> LoginUser([FromForm] LoginDTO.Request request)
         {
             if (!ModelState.IsValid)
+            {
                 return BadRequest(ModelState);
+            }
 
             var result = await _authRepository.LoginUserAsync(request);
-            if (result.Success)
-                return Ok(result);
-
-            return BadRequest(result);
+            return result.Success ? (IActionResult)Ok(result.Data) : BadRequest(result.Message);
         }
     }
 }

@@ -4,7 +4,8 @@
     {
         public Guid MessageId { get; set; }
         public string MessageText { get; set; }
-        public string MessageTime { get; set; }
+        public DateTime MessageTime { get; set; }
+        public string MessageTimeString { get; set; }
         public bool IsStarred { get; set; }
         public Guid SenderId { get; set; }
         public Guid ChatId { get; set; }
