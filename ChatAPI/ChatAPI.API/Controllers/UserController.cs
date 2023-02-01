@@ -81,7 +81,7 @@ namespace ChatAPI.API.Controllers
 
             var result = await _userRepository.DeleteUserProfileImageAsync(Guid.Parse(userId));
 
-            return result.Success ? Ok(result) : BadRequest(result.Message);
+            return result.Success ? Ok(result.Message) : BadRequest(result.Message);
         }
     }
 }

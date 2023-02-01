@@ -10,7 +10,7 @@ using System.Security.Claims;
 
 namespace ChatAPI.Application.Hubs
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+   // [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class ChatHub : Hub
     {
         private readonly IMessageReposiory _messageReposiory;
@@ -23,25 +23,44 @@ namespace ChatAPI.Application.Hubs
 
         public override Task OnConnectedAsync()
         {
-            Guid userId = Guid.Parse(Context.User.FindFirstValue(ClaimTypes.NameIdentifier));
+            //Guid userId = Guid.Parse(Context.User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            var user = new UserData()
-            {
-                ConnectedAt = DateTime.Now,
-                ConnectionId = Context.ConnectionId
-            };
-            _users.TryAdd(userId, user);
+            //var user = new UserData()
+            //{
+            //    ConnectedAt = DateTime.Now,
+            //    ConnectionId = Context.ConnectionId
+            //};
+            //_users.Add(userId, user);
             
             return base.OnConnectedAsync();
         }
 
-        public async Task SendMessage(SendMessageDto.Request request)
+        public async Task SendMessage(string user, string message)
         {
-            if (_users.TryGetValue(request.ReceiverId, out UserData user))
-            {
-                var message = await _messageReposiory.SendMessageAsync(request);
-                await Clients.Client(user.ConnectionId).SendAsync("ReceiveMessage", message);
-            }
+
+
+
+            await Clients.All.SendAsync("ReceiveMessage", user, message);
+            //var message = await _messageReposiory.SendMessageAsync(request);
+
+            //if (message.Success)
+            //{
+            //    if (_users.TryGetValue(request.ReceiverId, out UserData user))
+            //    {
+            //        await Clients.Client(user.ConnectionId).SendAsync("ReceiveMessage", message.Data);
+            //        await Clients.Client(user.ConnectionId).SendAsync("ReceiveMessage", "Ahmed Ismail");
+            //    }
+            //}
+            //else
+            //{
+            //    if (_users.TryGetValue(request.SenderId, out UserData user))
+            //    {
+            //        await Clients.Client(user.ConnectionId).SendAsync("ReceiveMessage", message.Message);
+            //    }                                                                                                                                                                                                                                           
+
+
+            //}
+
         }
         //public async Task JoinGroup(string groupName)
         //{

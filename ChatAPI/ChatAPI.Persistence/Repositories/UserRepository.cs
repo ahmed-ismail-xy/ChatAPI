@@ -6,8 +6,8 @@ using ChatAPI.Application.RepositoryDTOs.UserRepository;
 using ChatAPI.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ChatAPI.Persistence.Repositories
 {
@@ -15,11 +15,13 @@ namespace ChatAPI.Persistence.Repositories
     {
         protected readonly ChatDbContext _dbContext;
         private readonly IMapper _mapper;
+        private readonly ILogger<UserRepository> _logger;
 
-        public UserRepository(ChatDbContext dbContext, IMapper mapper)
+        public UserRepository(ChatDbContext dbContext, IMapper mapper, ILogger<UserRepository> logger)
         {
             _dbContext = dbContext;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<APIResponse<List<GetUserDTO.Response>>> GetListAllUsersAsync(Guid userId)
@@ -35,6 +37,7 @@ namespace ChatAPI.Persistence.Repositories
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message, ex);
                 response.Message = "Unexpected Error Occurred.";
                 response.AddError(10);
                 return response;
@@ -60,6 +63,7 @@ namespace ChatAPI.Persistence.Repositories
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message, ex);
                 response.Message = "Unexpected Error Occurred.";
                 response.AddError(10);
                 return response;
@@ -121,6 +125,8 @@ namespace ChatAPI.Persistence.Repositories
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message);
+                _logger.LogInformation("Request INFO:", request.ToString());
                 result.Message = "Unexpected Error Occurred.";
                 result.AddError(10);
                 return result;
@@ -181,6 +187,7 @@ namespace ChatAPI.Persistence.Repositories
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message, ex);
                 response.Message = "Unexpected Error Occurred.";
                 response.AddError(10);
                 return response;
@@ -223,6 +230,7 @@ namespace ChatAPI.Persistence.Repositories
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message, ex);
                 response.Message = "Unexpected Error Occurred.";
                 response.AddError(10);
                 return response;

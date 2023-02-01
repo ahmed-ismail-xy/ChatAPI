@@ -6,6 +6,8 @@ using ChatAPI.Application.RepositoryDTOs.ChatRepository.GetListAllChats;
 using ChatAPI.Application.RepositoryDTOs.UserRepository;
 using ChatAPI.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -15,14 +17,14 @@ namespace ChatAPI.Persistence.Repositories
     {
         protected readonly ChatDbContext _dbContext;
         private readonly IMapper _mapper;
+        private readonly ILogger<ChatRepository> _logger;
 
-        public ChatRepository(ChatDbContext dbContext, IMapper mapper)
+        public ChatRepository(ChatDbContext dbContext, IMapper mapper, ILogger<ChatRepository> logger)
         {
             _dbContext = dbContext;
             _mapper = mapper;
+            _logger = logger;
         }
-
-
 
         public async Task<APIResponse<Guid>> CreateChatAsync(CreateChatDTO.Request request)
         {
@@ -41,35 +43,21 @@ namespace ChatAPI.Persistence.Repositories
 
                 ChatMember newChatMember = CreateChatMember(request.SenderId, request.ReceiverId);
                 Chat newChat = await CreateChatAsync(newChatMember.ChatMemberId);
-                
-                SendFirstMessage(request.SenderId, newChat.ChatId);
-                
+
+                await SendWelcomeMessage(newChat.ChatId, request.SenderId);
+
                 response.Data = newChat.ChatId;
                 return response;
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message);
+                _logger.LogInformation("Request INFO:", request.ToString());
                 response.Message = "Unexpected Error Occurred.";
                 response.AddError(10);
                 return response;
             }
            
-        }
-        private void SendFirstMessage(Guid senderId, Guid chatId)
-        {
-            Message message = new Message()
-            {
-                MessageTime = DateTime.Now,
-                MessageStateId = Guid.Parse("0c8e6b62-15e7-4fb3-b97b-f8c0442ddcd9"),
-                ChatId = chatId,
-                MessageTypeId = Guid.Parse("4a1030fb-2903-4b59-9409-9aca22cbb82c"),
-                MessageText = "Start Chating Now.",
-                SenderId= senderId,
-                MessageTimeString= DateTime.Now.ToString(),
-                IsStarred= false,
-            };
-             _dbContext.Messages.Add(message);
-            _dbContext.SaveChanges();
         }
         private async Task<ChatMember> GetExistingChatMemberAsync(Guid senderId, Guid receiverId)
         {
@@ -103,7 +91,25 @@ namespace ChatAPI.Persistence.Repositories
             };
             await _dbContext.Chats.AddAsync(chat);
             await _dbContext.SaveChangesAsync();
+
             return chat;
+        }
+        private async Task SendWelcomeMessage(Guid chatIs, Guid senderId)
+        {
+            Message message = new Message
+            {
+                ChatId = chatIs,
+                SenderId = senderId,
+                FileLists = null,
+                IsStarred = false,
+                MessageStateId = Guid.Parse("fc07c939-594c-4ca0-8bf8-ccdd81a3f33b"),
+                MessageTypeId = Guid.Parse("4a1030fb-2903-4b59-9409-9aca22cbb82c"),
+                MessageText = "Welcome",
+                MessageTime = DateTime.Now,
+                MessageTimeString = DateTime.Now.ToString()
+            };
+            await _dbContext.Messages.AddAsync(message);
+            await _dbContext.SaveChangesAsync();
         }
         public async Task<APIResponse<List<ChatDTO>>> GetListAllChatsAsync(Guid userId)
         {
@@ -117,7 +123,8 @@ namespace ChatAPI.Persistence.Repositories
 
                 if (chatMembers == null || !chatMembers.Any())
                 {
-                    result.Message = "No chat members found for the user.";
+                    result.AddError(12);
+                    result.Message = "No chat found for the user.";
                     return result;
                 }
 
@@ -130,6 +137,7 @@ namespace ChatAPI.Persistence.Repositories
 
                     if (receiver == null)
                     {
+                        result.Errors.Add(13);
                         result.Message = "No receiver found for the chat member.";
                         continue;
                     }
@@ -138,6 +146,7 @@ namespace ChatAPI.Persistence.Repositories
                                 .FirstOrDefault(c => c.ChatMemberId == chatMember.ChatMemberId);
                     if (chat == null)
                     {
+                        result.Errors.Add(14);
                         result.Message = "No chat found for the chat member.";
                         continue;
                     }
@@ -152,7 +161,7 @@ namespace ChatAPI.Persistence.Repositories
                         UserId = receiverId,
                         ChatId = chat.ChatId,
                         ChatImage = receiver.UserImage,
-                        ChatName = receiver.FirstName + receiver.LastName,
+                        ChatName = $"{receiver.FirstName} {receiver.LastName}",
                         FireToken = receiver.FireToken,
                         PhoneNumber = receiver.PhoneNumber,
                         LastMessageDto = new LastMessageDto
@@ -174,6 +183,8 @@ namespace ChatAPI.Persistence.Repositories
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message, ex);
+                result.Errors.Add(15);
                 result.Message = "An error occurred while retrieving the chat list: " + ex.Message;
                 return result;
             }

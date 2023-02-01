@@ -1,0 +1,68 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.SignalR.Client;
+@inject NavigationManager NavManager;
+@implements IAsyncDisposable;
+
+<div class="form-gruop">
+    <label>
+        user: <input @bind="userInput" />
+    </label>
+</div>
+<div class="form-gruop">
+    <label>
+        massege: <input @bind="massegeInput" />
+    </label>
+</div>
+<button @onclick="SendMassege" disabled="@(IsConnected==false)">Send</button>
+
+<hr />
+
+<ul>
+    @foreach (var item in masseges)
+    {
+        <li>@item</li>
+    }
+</ul>
+
+@code {
+    private HubConnection? _hubConnection;
+    private List<string> masseges = new List<string>();
+    private string? userInput;
+    private string? massegeInput;
+    string url = "http://localhost:5078/chathub";
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        _hubConnection = new HubConnectionBuilder()
+            .WithUrl(url)
+            .Build();
+
+        _hubConnection.On<string, string>("ReceiveMassege", (user, message) =>
+        {
+            var formattedMessage = $"{user}: {message}";
+            masseges.Add(formattedMessage);
+            InvokeAsync(StateHasChanged);
+        });
+        await _hubConnection.StartAsync();
+    }
+
+    private async Task SendMassege()
+    {
+        if (_hubConnection is not null)
+        {
+            await _hubConnection.SendAsync("SendMassege", userInput, massegeInput);
+        }
+    }
+
+    public bool IsConnected => _hubConnection?.State == HubConnectionState.Connected;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_hubConnection is not null)
+        {
+            await _hubConnection.DisposeAsync();
+        }
+    }
+}
+

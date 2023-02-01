@@ -3,8 +3,10 @@ using ChatAPI.Application.Contracts;
 using ChatAPI.Application.Featuers.ResponseHandler;
 using ChatAPI.Application.RepositoryDTOs.AuthRepository;
 using ChatAPI.Domain.Entities;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -17,12 +19,16 @@ namespace ChatAPI.Persistence.Repositories
         protected readonly ChatDbContext _dbContext;
         private readonly IMapper _mapper;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<AuthRepository> _logger;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AuthRepository(ChatDbContext dbContext, IConfiguration configuration, IMapper mapper)
+        public AuthRepository(ChatDbContext dbContext, IMapper mapper, IConfiguration configuration, ILogger<AuthRepository> logger, IHttpContextAccessor httpContextAccessor)
         {
             _dbContext = dbContext;
             _mapper = mapper;
             _configuration = configuration;
+            _logger = logger;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<APIResponse<LoginDTO.Response>> RegisterUserAsync(RegisterDTO.Request request)
@@ -56,6 +62,9 @@ namespace ChatAPI.Persistence.Repositories
             }
             catch (Exception ex)
             {
+                var requestId = _httpContextAccessor.HttpContext.Response.Headers["Request-Id"];
+                _logger.LogError(requestId,ex.Message);
+                _logger.LogInformation(requestId,": Request INFO:", request.ToString());
                 response.Message = "Unexpected Error Occurred.";
                 response.AddError(10);
                 return response;
@@ -104,6 +113,8 @@ namespace ChatAPI.Persistence.Repositories
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex.Message);
+                _logger.LogInformation("Request INFO:", request.ToString());
                 response.Message = "Unexpected Error Occurred.";
                 response.AddError(10);
                 return response;
