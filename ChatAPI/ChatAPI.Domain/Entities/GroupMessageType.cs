@@ -4,6 +4,5 @@
     {
         public Guid GroupMessageTypeId { get; set; }
         public string MessageTypeName { get; set; }
-        public GroupMessage GroupMessage { get; set; }
     }
 }

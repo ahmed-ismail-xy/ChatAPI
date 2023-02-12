@@ -4,9 +4,8 @@
     {
         public Guid GroupMemberId { get; set; }
 
-        public User User { get; set; }
         public Guid MemberId { get; set; }
-
-        public Group Group { get; set; }
+        public bool IsAdmin { get; set; }
+        public Guid GroupId { get; set; }
     }
 }

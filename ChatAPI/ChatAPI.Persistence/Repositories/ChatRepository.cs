@@ -123,8 +123,7 @@ namespace ChatAPI.Persistence.Repositories
 
                 if (chatMembers == null || !chatMembers.Any())
                 {
-                    result.AddError(12);
-                    result.Message = "No chat found for the user.";
+                    result.Message = "No chats found for the user.";
                     return result;
                 }
 

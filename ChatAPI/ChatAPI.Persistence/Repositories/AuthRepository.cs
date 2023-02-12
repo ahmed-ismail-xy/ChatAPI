@@ -52,7 +52,7 @@ namespace ChatAPI.Persistence.Repositories
                 var newUser = _mapper.Map<User>(request);
                 newUser.UserPrivacyId = Guid.Parse("2ed2f3de-bda8-49af-86e3-51d08ead5f4a");
                 newUser.CreateAt = DateTime.Now;
-                string imagePath = Path.Combine(@"chatmedia\userprofileimage", "DefaultProfile.png");
+                string imagePath = Path.Combine(@"chatmedia\userprofileimage", "DefaultProfileImage.png");
                 newUser.UserImage = @$"{imagePath}";
                 await _dbContext.Users.AddAsync(newUser);
                 await _dbContext.SaveChangesAsync();

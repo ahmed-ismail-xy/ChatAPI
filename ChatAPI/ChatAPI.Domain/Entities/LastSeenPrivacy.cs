@@ -4,7 +4,5 @@
     {
         public Guid LastSeenPrivacyId { get; set; }
         public string LastSeenState { get; set; }
-
-        public UserPrivacy UserPrivacy { get; set; }
     }
 }

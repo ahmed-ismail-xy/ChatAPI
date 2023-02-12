@@ -19,5 +19,14 @@ namespace ChatAPI.Persistence
         public DbSet<MessageType> MessageTypes { get; set; }
         public DbSet<ProfileImagePrivacy> ProfileImagePrivacies { get; set; }
         public DbSet<UserPrivacy> UserPrivacies { get; set; }
+
+        public DbSet<Group> Groups { get; set; }
+        public DbSet<GroupFilesList> GroupFilesLists { get; set; }
+        public DbSet<GroupMember> GroupMembers { get; set; }
+        public DbSet<GroupMessage> GroupMessages { get; set; }
+        public DbSet<GroupMessageState> groupMessageStates { get; set; }
+        public DbSet<GroupMessageType> groupMessageTypes { get; set; }
+        public DbSet<GroupSetting> groupSettings { get; set; }
+
     }
 }
